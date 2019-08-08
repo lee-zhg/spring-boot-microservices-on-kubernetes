@@ -85,7 +85,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
    ```
 
 
-### 3. Deploy Database `MySQL` service
+### 3. Deploy `MySQL` Database
 
    * Deploy MySQL database
 
