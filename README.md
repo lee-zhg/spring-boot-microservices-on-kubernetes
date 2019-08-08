@@ -107,7 +107,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
       ```
 
 
-### 4. Deploy Microservice `compute-interest-api`
+### 4. Deploy `compute-interest-api` service
 
 Microservice `compute-interest-api` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
@@ -118,7 +118,7 @@ Microservice `compute-interest-api` is written in Spring Boot. It's deployed to 
    ```
 
 
-### 5. Deploy Microservice `send-notification`
+### 5. Deploy `send-notification` service
 
 Microservice `send-notification` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
@@ -129,7 +129,7 @@ Microservice `send-notification` is written in Spring Boot. It's deployed to you
    ```
 
 
-### 6. Deploy Microservice `account-summary` - the Frontend User Interface
+### 6. Deploy `account-summary` service - the Frontend User Interface
 
 The Frontend User Interface is a Node.js app serving static files (HTML, CSS, JavaScript) that shows the total account balance. It's another component of your service mesh.
 
@@ -140,7 +140,7 @@ The Frontend User Interface is a Node.js app serving static files (HTML, CSS, Ja
    ```
 
 
-### 7. Deploy Microservice `transaction-generator` - the Transaction Generator service
+### 7. Deploy `transaction-generator` service - the Transaction Generator service
 
 The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh.
 
