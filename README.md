@@ -1,14 +1,18 @@
-[![Build Status](https://travis-ci.org/IBM/spring-boot-microservices-on-kubernetes.svg?branch=master)](https://travis-ci.org/IBM/spring-boot-microservices-on-kubernetes)
-
 # Build and deploy Java Spring Boot microservices on Kubernetes
 
 Spring Boot is one of the popular Java microservices framework. Spring Cloud has a rich set of well integrated Java libraries to address runtime concerns as part of the Java application stack, and Kubernetes provides a rich featureset to run polyglot microservices. Together these technologies complement each other and make a great platform for Spring Boot applications.
 
 In this code we demonstrate how a simple Spring Boot application can be deployed on top of Kubernetes. This application, Office Space, mimicks the fictitious app idea from Michael Bolton in the movie [Office Space](http://www.imdb.com/title/tt0151804/). The app takes advantage of a financial program that computes interest for transactions by diverting fractions of a cent that are usually rounded off into a seperate bank account.
 
-The application uses a Java 8/Spring Boot microservice that computes the interest then takes the fraction of the pennies to a database. Another Spring Boot microservice is the notification service. It sends email when the account balance reach more than $50,000. It is triggered by the Spring Boot webserver that computes the interest. The frontend uses a Node.js app that shows the current account balance accumulated by the Spring Boot app. The backend uses a MySQL database to store the account balance.
+The application includes a few components and they are written in different languages.
+   * The key coponent of the application is a Java 8/Spring Boot microservice that computes the interest then takes the fraction of the pennies to a database. 
+   * Another Spring Boot microservice is the notification service. It sends email when the account balance reach more than $50,000. It is triggered by the Spring Boot webserver that computes the interest. 
+   * The frontend user interafce is a Node.js application that shows the current account balance accumulated by the Spring Boot app. 
+   * The backend uses a MySQL database to store the account balance.
+   * The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh and used to simulate the transaction activities.
 
 The instructions were adapted from the more comprehensive tutorial found here - https://github.com/IBM/spring-boot-microservices-on-kubernetes.
+
 
 ## Flow
 
@@ -16,9 +20,9 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 
 1. The Transaction Generator service written in Python simulates transactions and pushes them to the Compute Interest microservice.
 2. The Compute Interest microservice computes the interest and then moves the fraction of pennies to the MySQL database to be stored. The database can be running within a container in the same deployment or on a public cloud such as IBM Cloud.
-3. The Compute Interest microservice then calls the notification service to notify the user if an amount has been deposited in the user’s account.
+3. The Compute Interest microservice then calls the notification service to notify the user when the total amount in the user’s account reaches $50,000.
 4. The Notification service uses IBM Cloud Function to send an email message to the user.
-5. The user retrieves the account balance by visiting the Node.js web interface.
+5. The front end user interface in Node.js retrieves the account balance and display.
 
 ## Included Components
 
@@ -40,12 +44,17 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 
 
 # Steps
-1. [Clone the repo](#1-clone-the-repo)
-2. [Create the Database service](#2-create-the-database-service)
-3. [Create the Spring Boot Microservices](#3-create-the-spring-boot-microservices)
-4. [Use IBM Cloud Functions with Notification service *(Optional)*](#4-use-ibm-cloud-functions-with-notification-service)
-5. [Deploy the Microservices](#5-deploy-the-microservices)
-6. [Access Your Application](#6-access-your-application)
+
+1. Clone the repo
+2. Modify send-notification.yaml file for email notification
+3. Deploy Database `MySQL` service
+4. Deploy Microservice `compute-interest-api`
+5. Deploy Microservice `send-notification`
+6. Deploy Microservice `account-summary` - the Frontend User Interface
+7. Deploy Microservice `transaction-generator` - the Transaction Generator service
+8. Access Your Application
+
+Each service in the application run in their containers. It has a Deployment and a Service. The deployment manages the pods started for each microservice. The Service creates a stable DNS entry for each microservice so they can reference their dependencies by name.
 
 
 ### 1. Clone the repo
@@ -76,14 +85,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
    ```
 
 
-### 3. Create the Database service
-
-MySQL database and each microservice run in their containers. 
-
-Each microservice has a Deployment and a Service. The deployment manages
-the pods started for each microservice. The Service creates a stable
-DNS entry for each microservice so they can reference their
-dependencies by name.
+### 3. Deploy Database `MySQL` service
 
    * Deploy MySQL database
 
@@ -105,138 +107,95 @@ dependencies by name.
       ```
 
 
-### 4. Use IBM Cloud Functions with Notification service
+### 4. Deploy Microservice `compute-interest-api`
 
-> This is an optional step if you want to try IBM Cloud Functions
+Microservice `compute-interest-api` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
-Create action for sending **Gmail Notification**
-```bash
-$ ibmcloud cf action create sendEmailNotification sendEmail.js --web true
-```
-
-* Test Actions
-
-You can test your IBM Cloud Function Actions using `wsk action invoke [action name] [add --param to pass  parameters]`
-
-Invoke Email Notification
-```bash
-$ wsk action invoke sendEmailNotification --param sender [sender email] --param password [sender password]--param receiver [receiver email] --param subject [Email subject] --param text [Email Body]
-```
-You should receive a slack message and receive an email respectively.
-
-* Create REST API for Actions
-
-You can map REST API endpoints for your created actions using `wsk api create`. The syntax for it is `wsk api create [base-path] [api-path] [verb (GET PUT POST etc)] [action name]`
-
-Create endpoint for **Gmail Notification**
-```bash
-$ wsk api create /v1 /email POST sendEmailNotification
-ok: created API /v1/email POST for action /_/sendEmailNotification
-https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/.../v1/email
-```
-
-You can view a list of your APIs with this command:
-
-```bash
-$ wsk api list
-
-ok: APIs
-Action                                      Verb  API Name  URL
-/Anthony.Amanse_dev/sendEmailNotificatio    post       /v1  https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/.../v1/email
-/Anthony.Amanse_dev/testDefault             post       /v1  https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/.../v1/slack
-```
-
-Take note of your API URLs. You are going to use them later.
+   ```bash
+   $ kubectl apply -f compute-interest-api.yaml
+   service "compute-interest-api" created
+   deployment "compute-interest-api" created
+   ```
 
 
-![Slack Notification](images/slackNotif.png)
+### 5. Deploy Microservice `send-notification`
 
-Test endpoint for **Gmail Notification**. Replace the URL with your own API URL. Replace the value of the parameters **sender, password, receiver, subject** with your own.
+Microservice `send-notification` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
-```bash
-$ curl -X POST -H 'Content-type: application/json' -d '{ "text": "Hello from OpenWhisk", "subject": "Email Notification", "sender": "testemail@gmail.com", "password": "passwordOfSender", "receiver": "receiversEmail" }' https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/.../v1/email
-```
-![Email Notification](images/emailNotif.png)
+   ```bash
+   $ kubectl apply -f send-notification.yaml
+   service "send-notification" created
+   deployment "send-notification" created
+   ```
 
-* Add REST API Url to yaml files
 
-Once you have confirmed that your APIs are working, put the URLs in your `send-notification.yaml` file
-```yaml
-env:
-- name: GMAIL_SENDER_USER
-  value: 'username@gmail.com' # the sender's email
-- name: GMAIL_SENDER_PASSWORD
-  value: 'password' # the sender's password
-- name: EMAIL_RECEIVER
-  value: 'sendTo@gmail.com' # the receiver's email
-- name: OPENWHISK_API_URL_EMAIL
-  value: 'https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/.../v1/email' # your API endpoint for email notifications
-```
+### 6. Deploy Microservice `account-summary` - the Frontend User Interface
 
-### 5. Deploy the Microservices
+The Frontend User Interface is a Node.js app serving static files (HTML, CSS, JavaScript) that shows the total account balance. It's another component of your service mesh.
 
-* Deploy Spring Boot Microservices
+   ```bash
+   $ kubectl apply -f account-summary.yaml
+   service "account-summary" created
+   deployment "account-summary" created
+   ```
 
-```bash
-$ kubectl apply -f compute-interest-api.yaml
-service "compute-interest-api" created
-deployment "compute-interest-api" created
-```
 
-```bash
-$ kubectl apply -f send-notification.yaml
-service "send-notification" created
-deployment "send-notification" created
-```
+### 7. Deploy Microservice `transaction-generator` - the Transaction Generator service
 
-* Deploy the Frontend service
+The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh.
 
-The UI is a Node.js app serving static files (HTML, CSS, JavaScript) that shows the total account balance.
+   ```bash
+   $ kubectl apply -f transaction-generator.yaml
+   service "transaction-generator" created
+   deployment "transaction-generator" created
+   ```
 
-```bash
-$ kubectl apply -f account-summary.yaml
-service "account-summary" created
-deployment "account-summary" created
-```
+### 8. Access Your Application
 
-* Deploy the Transaction Generator service
-The transaction generator is a Python app that generates random transactions with accumulated interest.
+One way to access your application is through `Public IP` and `NodePort`.
 
-Create the transaction generator **Python** app:
-```bash
-$ kubectl apply -f transaction-generator.yaml
-service "transaction-generator" created
-deployment "transaction-generator" created
-```
+* Locate public IP address
 
-### 6. Access Your Application
-You can access your app publicly through your Cluster IP and the NodePort. The NodePort should be **30080**.
+   ```bash
+   $ ibmcloud cs workers <cluster-name>
+   ID                                                 Public IP        Private IP      Machine Type   State    Status   
+   kube-dal10-paac005a5fa6c44786b5dfb3ed8728548f-w1   169.47.241.213   10.177.155.13   free           normal   Ready  
+   ```
 
-* To find your IP:
-```bash
-$ ibmcloud cs workers <cluster-name>
-ID                                                 Public IP        Private IP      Machine Type   State    Status   
-kube-dal10-paac005a5fa6c44786b5dfb3ed8728548f-w1   169.47.241.213   10.177.155.13   free           normal   Ready  
-```
+   Take note of `Public IP`. `169.47.241.213` in this example.
 
-* To find the NodePort of the account-summary service:
-```bash
-$ kubectl get svc
-NAME                    CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                                      AGE
-...
-account-summary         10.10.10.74    <nodes>       80:30080/TCP                                                                 2d
-...
-```
-* On your browser, go to `http://<your-cluster-IP>:30080`
-![Account-balance](images/balance.png)
+* Locate NodePort
 
-## Troubleshooting
-* To start over, delete everything: `kubectl delete svc,deploy -l app=office-space`
+   ```bash
+   $ kubectl get svc
+   NAME                    CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                                      AGE
+   ......
+   account-summary         10.10.10.74    <nodes>       80:30080/TCP                                                                 2d
+   ......
+   ```
+
+   Take note of `PORT(S)` of the service `account-summary`. `30080` in the example.
+
+* Access your application
+
+   To test your application, go to `http://<Public IP>:<Port>` in your browser. For example, htpp://169.47.241.213:30080 in this example.
+
+   ![Account-balance](images/balance.png)
+
+
+## Clean up
+
+To delete everything created during this session, 
+
+   ```
+   kubectl delete svc,deploy -l app=office-space
+   ```
 
 
 ## References
 * [John Zaccone](https://github.com/jzaccone) - The original author of the [office space app deployed via Docker](https://github.com/jzaccone/office-space-dockercon2017).
 * The Office Space app is based on the 1999 film that used that concept.
+
 
 ## License
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](http://www.apache.org/licenses/LICENSE-2.0.txt).
