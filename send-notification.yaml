@@ -35,11 +35,11 @@ spec:
           name: send-notification
           env:
             - name: GMAIL_SENDER_USER
-              value: 'username@gmail.com'
+              value: 'cloud1001lz@gmail.com'
             - name: GMAIL_SENDER_PASSWORD
-              value: 'password@gmail.com'
+              value: 'Tivoli12'
             - name: EMAIL_RECEIVER
-              value: 'sendTo@gmail.com'
+              value: 'cloud1001lzTo@gmail.com'
             - name: NOTIFICATION_MESSAGE
               value: 'Your balance is over $50,000.00'
             - name: OPENWHISK_API_URL_EMAIL
