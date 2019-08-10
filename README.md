@@ -170,7 +170,7 @@ One way to access your application is through `Public IP` and `NodePort`.
 * Locate public IP address
 
    ```bash
-   $ ibmcloud cs workers <cluster-name>
+   $ ibmcloud cs workers $USERNAME-cluster
    ID                                                 Public IP        Private IP      Machine Type   State    Status   
    kube-dal10-paac005a5fa6c44786b5dfb3ed8728548f-w1   169.47.241.213   10.177.155.13   free           normal   Ready  
    ```
