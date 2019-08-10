@@ -1,15 +1,17 @@
-# Build and deploy Java Spring Boot microservices on Kubernetes
+# Deploy Java Spring Boot microservices on Kubernetes
 
 Spring Boot is one of the popular Java microservices framework. Spring Cloud has a rich set of well integrated Java libraries to address runtime concerns as part of the Java application stack, and Kubernetes provides a rich featureset to run polyglot microservices. Together these technologies complement each other and make a great platform for Spring Boot applications.
 
 In this code we demonstrate how a simple Spring Boot application can be deployed on top of Kubernetes. This application, Office Space, mimicks the fictitious app idea from Michael Bolton in the movie [Office Space](http://www.imdb.com/title/tt0151804/). The app takes advantage of a financial program that computes interest for transactions by diverting fractions of a cent that are usually rounded off into a seperate bank account.
 
-The application includes a few components and they are written in different languages.
+The application includes a few services and they are written in different languages.
    * The key coponent of the application is a Java 8/Spring Boot microservice that computes the interest then takes the fraction of the pennies to a database. 
    * Another Spring Boot microservice is the notification service. It sends email when the account balance reach more than $50,000. It is triggered by the Spring Boot webserver that computes the interest. 
    * The frontend user interafce is a Node.js application that shows the current account balance accumulated by the Spring Boot app. 
    * The backend uses a MySQL database to store the account balance.
    * The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh and used to simulate the transaction activities.
+
+During this session, we focus on deploying the microservices due to time constraint. If you are interested, source codes for the services are available for your review.
 
 The instructions were adapted from the more comprehensive tutorial found here - https://github.com/IBM/spring-boot-microservices-on-kubernetes.
 
@@ -40,7 +42,9 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 
    * Access to a Kubernetes cluster - A cluster was created when the session started
 
-   * IBM Cloud Function sending email notification - was created for the session
+   * IBM Cloud Function sending email notification - was created before the session
+
+   * Docker image of each service has been made available on Docker Hub.
 
 
 # Steps
@@ -62,7 +66,7 @@ Each service in the application run in their containers. It has a Deployment and
 Clone this repository. In a terminal, run:
 
 ```
-$ git clone https://github.com/IBM/spring-boot-microservices-on-kubernetes
+$ git clone https://github.com/lee-zhg/spring-boot-microservices-on-kubernetes
 
 $ cd  spring-boot-microservices-on-kubernetes
 ```
@@ -70,7 +74,7 @@ $ cd  spring-boot-microservices-on-kubernetes
 
 ### 2. Modify send-notification.yaml file for email notification
 
-> **Note: Additional Gmail security configurations are required by Gmail to send/received email in this way.**
+> **Note: Additional Gmail security configurations may be required by Gmail to send/received email in this way.**
 
 Optionally, if you like to send and receive email (gmail) notification, You will need to modify the **environment variables** in the `send-notification.yaml` file:
 
@@ -178,7 +182,7 @@ One way to access your application is through `Public IP` and `NodePort`.
 
 * Access your application
 
-   To test your application, go to `http://<Public IP>:<Port>` in your browser. For example, htpp://169.47.241.213:30080 in this example.
+   To test your application, go to `http://<Public IP>:<Port>` in your browser. For example, http://169.47.241.213:30080 in this example.
 
    ![Account-balance](images/balance.png)
 
