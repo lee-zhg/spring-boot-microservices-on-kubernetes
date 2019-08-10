@@ -11,7 +11,7 @@ The application includes a few services and they are written in different langua
    * The backend uses a MySQL database to store the account balance.
    * The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh and used to simulate the transaction activities.
 
-During this session, we focus on deploying the microservices due to time constraint. If you are interested, source codes for the services are available for your review.
+During this session, we focus on deploying the microservices due to time constraint. Feel free to review the source code of the services, if you are interested.
 
 The instructions were adapted from the more comprehensive tutorial found here - https://github.com/IBM/spring-boot-microservices-on-kubernetes.
 
