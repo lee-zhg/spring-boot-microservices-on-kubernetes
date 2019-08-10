@@ -38,7 +38,7 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 * [Databases](https://en.wikipedia.org/wiki/IBM_Information_Management_System#.22Full_Function.22_databases): Repository for storing and managing collections of data.
 * [Serverless](https://www.ibm.com/cloud/functions): An event-action platform that allows you to execute code in response to an event.
 
-# Prerequisite
+## Prerequisite
 
    * Access to a Kubernetes cluster - A cluster was created when the session started
 
@@ -47,7 +47,16 @@ The instructions were adapted from the more comprehensive tutorial found here - 
    * Docker image of each service has been made available on Docker Hub.
 
 
-# Steps
+## Setup
+
+1. Lab Environment Setup
+
+    Every time when you start a new terminal/command window, steps in the section must be performed to setup a new environment.
+
+    [Follow the instructions here](README_pre02.md)
+
+
+## Steps
 
 1. Clone the repo
 2. Modify send-notification.yaml file for email notification
