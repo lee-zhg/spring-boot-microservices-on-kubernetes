@@ -1,22 +1,35 @@
-# Deploy Java Spring Boot microservices on Kubernetes
+# Deploying Microservices
 
-Spring Boot is one of the popular Java microservices framework. Spring Cloud has a rich set of well integrated Java libraries to address runtime concerns as part of the Java application stack, and Kubernetes provides a rich featureset to run polyglot microservices. Together these technologies complement each other and make a great platform for Spring Boot applications.
+## Deploy Office Space sample application on Kubernetes
 
-In this code we demonstrate how a simple Spring Boot application can be deployed on top of Kubernetes. This application, Office Space, mimicks the fictitious app idea from Michael Bolton in the movie [Office Space](http://www.imdb.com/title/tt0151804/). The app takes advantage of a financial program that computes interest for transactions by diverting fractions of a cent that are usually rounded off into a seperate bank account.
+In this session, we demonstrate how a sample cloud native application can be deployed on top of Kubernetes. This application, Office Space, mimicks the fictitious app idea from Michael Bolton in the movie [Office Space](http://www.imdb.com/title/tt0151804/). The app takes advantage of a financial program that computes interest for transactions by diverting fractions of a cent that are usually rounded off into a seperate bank account.
 
-The application includes a few services and they are written in different languages.
-   * The key coponent of the application is a Java 8/Spring Boot microservice that computes the interest then takes the fraction of the pennies to a database. 
-   * Another Spring Boot microservice is the notification service. It sends email when the account balance reach more than $50,000. It is triggered by the Spring Boot webserver that computes the interest. 
-   * The frontend user interafce is a Node.js application that shows the current account balance accumulated by the Spring Boot app. 
-   * The backend uses a MySQL database to store the account balance.
-   * The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh and used to simulate the transaction activities.
-
-During this session, we focus on deploying the microservices due to time constraint. Feel free to review the source code of the services, if you are interested.
+The application includes a few services developed in different languages.
+   * The key coponent of the application is a `Java 8/Spring Boot` microservice that computes the interest then takes the fraction of the pennies to a database. 
+   * Another `Spring Boot microservice` is the notification service. It sends email when the account balance reach more than $50,000. It is triggered by the Spring Boot webserver that computes the interest. 
+   * The frontend user interafce is a `Node.js` application that shows the current account balance accumulated by the Spring Boot app. 
+   * The backend uses a `MySQL database` to store the account balance.
+   * The transaction generator is a `Python` application that generates random transactions with accumulated interest. It's the last piece of your service mesh and used to simulate the transaction activities.
 
 The instructions were adapted from the more comprehensive tutorial found here - https://github.com/IBM/spring-boot-microservices-on-kubernetes.
 
 
-## Flow
+### Develop Microservices
+
+During this session, we focus on deploying the microservices due to time constraint. Feel free to review the source code of the services, if you are interested.
+
+Couple of microservices were developed in `Spring Boot` which is one of the popular Java microservices framework. Spring Cloud has a rich set of well integrated Java libraries to address runtime concerns as part of the Java application stack, and Kubernetes provides a rich featureset to run polyglot microservices. Together these technologies complement each other and make a great platform for Spring Boot applications.
+
+Other microservices were developed in `Node.js` and `Python`. `MySQL Database` running in a separate container serves as persistent store. As a whole, the sample application delivers a native cloud architecture and follows 12 factors best practice.
+
+The source code are in the following subfolders
+   * containers/compute-interest-api
+   * containers/send-notification
+   * containers/account-summary
+   * containers/transaction-generator
+
+
+### Flow
 
 ![spring-boot-kube](images/architecture.png)
 
@@ -26,19 +39,19 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 4. The Notification service uses IBM Cloud Function to send an email message to the user.
 5. The front end user interface in Node.js retrieves the account balance and display.
 
-## Included Components
+### Included Components
 
 * [IBM Cloud Kubernetes Service](https://console.bluemix.net/docs/containers/container_index.html): IBM Bluemix Container Service manages highly available apps inside Docker containers and Kubernetes clusters on the IBM Cloud.
 * [Compose for MySQL](https://console.ng.bluemix.net/catalog/services/compose-for-mysql): Probably the most popular open source relational database in the world.
 * [IBM Cloud Functions](https://console.ng.bluemix.net/openwhisk): Execute code on demand in a highly scalable, serverless environment.
 
-## Featured Technologies
+### Featured Technologies
 
 * [Container Orchestration](https://www.ibm.com/cloud/container-service): Automating the deployment, scaling and management of containerized applications.
 * [Databases](https://en.wikipedia.org/wiki/IBM_Information_Management_System#.22Full_Function.22_databases): Repository for storing and managing collections of data.
 * [Serverless](https://www.ibm.com/cloud/functions): An event-action platform that allows you to execute code in response to an event.
 
-## Prerequisite
+### Prerequisite
 
    * Access to a Kubernetes cluster - A cluster was created when the session started
 
@@ -47,7 +60,7 @@ The instructions were adapted from the more comprehensive tutorial found here - 
    * Docker image of each service has been made available on Docker Hub.
 
 
-## Setup
+### Setup
 
 1. Lab Environment Setup
 
@@ -56,7 +69,7 @@ The instructions were adapted from the more comprehensive tutorial found here - 
     [Follow the instructions here](README_pre02.md)
 
 
-## Steps
+### Steps
 
 1. Clone the repo
 2. Modify send-notification.yaml file for email notification
@@ -70,7 +83,7 @@ The instructions were adapted from the more comprehensive tutorial found here - 
 Each service in the application run in their containers. It has a Deployment and a Service. The deployment manages the pods started for each microservice. The Service creates a stable DNS entry for each microservice so they can reference their dependencies by name.
 
 
-### 1. Clone the repo
+#### 1. Clone the repo
 
 Clone this repository. In a terminal, run:
 
@@ -81,7 +94,7 @@ $ cd  spring-boot-microservices-on-kubernetes
 ```
 
 
-### 2. Modify send-notification.yaml file for email notification
+#### 2. Modify send-notification.yaml file for email notification
 
 > **Note: Additional Gmail security configurations may be required by Gmail to send/received email in this way.**
 
@@ -98,7 +111,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
    ```
 
 
-### 3. Deploy `MySQL` Database
+#### 3. Deploy `MySQL` Database
 
    * Deploy MySQL database
 
@@ -120,7 +133,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
       ```
 
 
-### 4. Deploy `compute-interest-api` service
+#### 4. Deploy `compute-interest-api` service
 
 Microservice `compute-interest-api` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
@@ -131,7 +144,7 @@ Microservice `compute-interest-api` is written in Spring Boot. It's deployed to 
    ```
 
 
-### 5. Deploy `send-notification` service
+#### 5. Deploy `send-notification` service
 
 Microservice `send-notification` is written in Spring Boot. It's deployed to your cluster as one component of your service mesh.
 
@@ -142,7 +155,7 @@ Microservice `send-notification` is written in Spring Boot. It's deployed to you
    ```
 
 
-### 6. Deploy `account-summary` service - the Frontend User Interface
+#### 6. Deploy `account-summary` service - the Frontend User Interface
 
 The Frontend User Interface is a Node.js app serving static files (HTML, CSS, JavaScript) that shows the total account balance. It's another component of your service mesh.
 
@@ -153,7 +166,7 @@ The Frontend User Interface is a Node.js app serving static files (HTML, CSS, Ja
    ```
 
 
-### 7. Deploy `transaction-generator` service - the Transaction Generator service
+#### 7. Deploy `transaction-generator` service - the Transaction Generator service
 
 The transaction generator is a Python application that generates random transactions with accumulated interest. It's the last piece of your service mesh.
 
@@ -163,7 +176,7 @@ The transaction generator is a Python application that generates random transact
    deployment "transaction-generator" created
    ```
 
-### 8. Access Your Application
+#### 8. Access Your Application
 
 One way to access your application is through `Public IP` and `NodePort`.
 
@@ -196,7 +209,7 @@ One way to access your application is through `Public IP` and `NodePort`.
    ![Account-balance](images/balance.png)
 
 
-## Clean up
+### Clean up
 
 To delete everything created during this session, 
 
@@ -205,12 +218,12 @@ To delete everything created during this session,
    ```
 
 
-## References
+### References
 * [John Zaccone](https://github.com/jzaccone) - The original author of the [office space app deployed via Docker](https://github.com/jzaccone/office-space-dockercon2017).
 * The Office Space app is based on the 1999 film that used that concept.
 
 
-## License
+### License
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](http://www.apache.org/licenses/LICENSE-2.0.txt).
 
 [Apache Software License (ASL) FAQ](http://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
