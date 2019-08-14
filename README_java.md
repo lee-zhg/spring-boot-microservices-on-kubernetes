@@ -10,6 +10,8 @@ In this session, you develop a Java Microservice using the `Java Microservice wi
 
 The Java source code is available in the Git repo that is created as part of the CI/CD pipeline. It can serve as a starting point of your development project. You can download the repo to your local machine, develop and test your service locally, then check in the complete version of your project back to your Git repo. This will trigger a re-build and re-deployment process. The latest version of your microservice is deployed and running in Kubernetes cluster.
 
+`Java Microservice with Spring Boot` starter kit is used as an example to jump start a development project of `Java Microservice`. Other starter kits in the IBM Cloud work similarly. If you prefer other language or framework in your project, the steps in this session can still be applied.
+
 The instructions were adapted from the more comprehensive tutorial found here - https://cloud.ibm.com/docs/apps/tutorials?topic=creating-apps-tutorial-scratch#prereqs-scratch.
 
 
