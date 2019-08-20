@@ -192,6 +192,95 @@ One way to access your application is through `Public IP` and `NodePort`.
    ![Account-balance](images/balance.png)
 
 
+### Explore the Kubernetes Dashboard
+
+Great, your application is deployed and working. 
+
+There are quite a few microservices within your application. As your application is working, you would expect that all services are working. Are they? Let's find out.
+
+After you have deployed all services, the Kubernetes Dashboard can provide an overview of your application and its components.
+
+1. Login to IBM Cloud.
+
+1. Locate and select your Kubernetes cluster.
+
+   ![Account-balance](images/k8s_ui.png)
+
+1. Click the `Kubernetes Daskboard` button.
+
+1. `Kubernetes Dashboard` window opens.
+
+   ![Account-balance](images/k8s_dashboard.png)
+
+1. The charts in `Workloads Statuses` section on the `Overview` page provides a high level view of your cluster status. They are color-coded. `RED` indicates major issue.
+
+1. Explore section `Deployments`, `Pods` and `Replica Sets`, they all indicate that the service `send-notification` failed.
+
+1. Navigate to different pages in the `Kubernetes Dashboard` and you may find specific information that may be more interesting to you.
+
+
+### Debug Deployment
+
+One of the cloud native architecture benefits is that your application can still function even individual services are not working. As your observed in the previous sections, your application appears working fine before you identified the `down` service in the `Kubernetes Dashboard`. 
+
+In this section, you learn the very basic debugging technics in the `Kubernetes Dashboard`.
+
+1. Select the `Overview` page in the `Kubernetes Dashboard`.
+
+1. Select `send-notification-xxxxxxx` entry in the `Replica Sets` section. 
+
+   ![Account-balance](images/k8s_relicasets.png)
+
+1. This opened `send-notification-xxxxxxx` entry in the `Replica Sets` page.
+
+1. Click the `LOGS` link on the top of the page.
+
+   ![Account-balance](images/k8s_relicasets_logs.png)
+
+1. Scan the log entries and you should find a section similar to the one below. It shows that `Could not resolve placeholder 'OPENWHISK_API_URL_SLACK' in value "${OPENWHISK_API_URL_SLACK}"`. 
+
+   ```
+   2019-08-20 18:07:24.209  WARN 14 --- [           main] ationConfigEmbeddedWebApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'triggerEmail': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'OPENWHISK_API_URL_SLACK' in value "${OPENWHISK_API_URL_SLACK}"
+   2019-08-20 18:07:24.212  INFO 14 --- [           main] o.apache.catalina.core.StandardService   : Stopping service Tomcat
+   2019-08-20 18:07:24.228  INFO 14 --- [           main] utoConfigurationReportLoggingInitializer : 
+   Error starting ApplicationContext. To display the auto-configuration report re-run your application with 'debug' enabled.
+   2019-08-20 18:07:24.236 ERROR 14 --- [           main] o.s.boot.SpringApplication               : Application startup failed
+   org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'triggerEmail': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'OPENWHISK_API_URL_SLACK' in value "${OPENWHISK_API_URL_SLACK}"
+   ```
+
+1. The service `send-notification` failed because it can't resolve environment variable `OPENWHISK_API_URL_SLACK`.
+
+1. There are multiple ways to fix the problem. If you prefer, you may edit the deployment.yaml file in tne `Kubernetes Dashboard` window.
+
+1. For the lab exercise, you fix the problem in the original .yaml file.
+
+   * Locate and open file `send-notification.yaml` at the root folder of `spring-boot-microservices-on-kubernetes` repo that you downloaded.
+   * Locate the section below.
+
+      ```
+      ---            - name: OPENWHISK_API_URL_SLACK
+      ---              value: ''
+      ---            - name: SLACK_MESSAGE
+      ---               value: ''
+      ```
+
+   * Uncomment the entries by removing the leading `---`.
+   * Save.
+
+1. Apply the changes.
+
+   ```
+   $ kubectl apply -f send-notification.yaml
+   
+   service/send-notification unchanged
+   deployment.extensions/send-notification configured
+   ```
+
+1. Go back to the `Overview` page of the `Kubernetes Dashboard`. All services are working now.
+
+   ![Account-balance](images/k8s_ok.png)
+
+
 ### Clean up
 
 To delete everything created during this session, 
