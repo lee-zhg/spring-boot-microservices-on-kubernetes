@@ -71,6 +71,8 @@ Each service in the application run in their containers. It has a Deployment and
 Clone this repository. In a terminal, run:
 
 ```
+cd  ~
+
 $ git clone https://github.com/lee-zhg/spring-boot-microservices-on-kubernetes
 
 $ cd  spring-boot-microservices-on-kubernetes
