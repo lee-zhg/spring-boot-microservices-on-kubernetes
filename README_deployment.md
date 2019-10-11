@@ -223,7 +223,7 @@ After you have deployed all services, the Kubernetes Dashboard can provide an ov
 
 ### Debug Deployment
 
-One of the cloud native architecture benefits is that your application can still function even individual services are not working. As your observed in the previous sections, your application appears working fine before you identified the `down` service in the `Kubernetes Dashboard`. 
+>**Note**: One of the cloud native architecture benefits is that your application can still function even individual services are not working. As your observed in the previous sections, your application appears working fine before you identified the `down` service in the `Kubernetes Dashboard`. 
 
 In this section, you learn the very basic debugging technics in the `Kubernetes Dashboard`.
 
