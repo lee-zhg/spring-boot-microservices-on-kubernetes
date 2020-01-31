@@ -71,7 +71,7 @@ Each service in the application run in their containers. It has a Deployment and
 Clone this repository. In a terminal, run:
 
 ```
-cd  ~
+$ cd  ~
 
 $ git clone https://github.com/lee-zhg/spring-boot-microservices-on-kubernetes
 
@@ -102,6 +102,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
 
       ```bash
       $ kubectl create -f account-database.yaml
+
       service "account-database" created
       deployment "account-database" created
       ```
@@ -114,6 +115,7 @@ Optionally, if you like to send and receive email (gmail) notification, You will
 
       ```
       $ kubectl apply -f secrets.yaml
+
       secret "demo-credentials" created
       ```
 
@@ -124,6 +126,7 @@ Microservice `compute-interest-api` is written in Spring Boot. It's deployed to 
 
    ```bash
    $ kubectl apply -f compute-interest-api.yaml
+
    service "compute-interest-api" created
    deployment "compute-interest-api" created
    ```
@@ -135,6 +138,7 @@ Microservice `send-notification` is written in Spring Boot. It's deployed to you
 
    ```bash
    $ kubectl apply -f send-notification.yaml
+
    service "send-notification" created
    deployment "send-notification" created
    ```
@@ -146,6 +150,7 @@ The Frontend User Interface is a Node.js app serving static files (HTML, CSS, Ja
 
    ```bash
    $ kubectl apply -f account-summary.yaml
+
    service "account-summary" created
    deployment "account-summary" created
    ```
@@ -157,6 +162,7 @@ The transaction generator is a Python application that generates random transact
 
    ```bash
    $ kubectl apply -f transaction-generator.yaml
+
    service "transaction-generator" created
    deployment "transaction-generator" created
    ```
@@ -168,7 +174,8 @@ One way to access your application is through `Public IP` and `NodePort`.
 * Locate public IP address
 
    ```bash
-   $ ibmcloud cs workers $USERNAME-cluster
+   $ ibmcloud ks workers $USERNAME-cluster
+
    ID                                                 Public IP        Private IP      Machine Type   State    Status   
    kube-dal10-paac005a5fa6c44786b5dfb3ed8728548f-w1   169.47.241.213   10.177.155.13   free           normal   Ready  
    ```
@@ -179,6 +186,7 @@ One way to access your application is through `Public IP` and `NodePort`.
 
    ```bash
    $ kubectl get svc
+
    NAME                    CLUSTER-IP     EXTERNAL-IP   PORT(S)                                                                      AGE
    ......
    account-summary         10.10.10.74    <nodes>       80:30080/TCP                                                                 2d
@@ -223,7 +231,7 @@ After you have deployed all services, the Kubernetes Dashboard can provide an ov
 
 ### Debug Deployment
 
->**Note**: One of the cloud native architecture benefits is that your application can still function even individual services are not working. As your observed in the previous sections, your application appears working fine before you identified the `down` service in the `Kubernetes Dashboard`. 
+One of the cloud native architecture benefits is that your application can still function even individual services are not working. As your observed in the previous sections, your application appears working fine before you identified the `down` service in the `Kubernetes Dashboard`. 
 
 In this section, you learn the very basic debugging technics in the `Kubernetes Dashboard`.
 
