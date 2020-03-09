@@ -260,7 +260,7 @@ In this section, you learn the very basic debugging technics in the `Kubernetes 
 
 1. The service `send-notification` failed because it can't resolve environment variable `OPENWHISK_API_URL_SLACK`.
 
-1. There are multiple ways to fix the problem. If you prefer, you may edit the deployment.yaml file in tne `Kubernetes Dashboard` window.
+1. There are multiple ways to fix the problem. If you prefer, you may edit the deployment.yaml file in the `Kubernetes Dashboard` window.
 
 1. For the lab exercise, you fix the problem in the original .yaml file.
 
