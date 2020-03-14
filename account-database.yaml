@@ -14,13 +14,16 @@ spec:
     app: office-space
     tier: database
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: account-database
   labels:
     app: office-space
 spec:
+  selector:
+    matchLabels:
+      app: office-space
   strategy:
     type: Recreate
   template:
