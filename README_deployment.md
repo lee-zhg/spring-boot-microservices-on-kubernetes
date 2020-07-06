@@ -171,10 +171,10 @@ The transaction generator is a Python application that generates random transact
 
 One way to access your application is through `Public IP` and `NodePort`.
 
-* Locate public IP address
+* Locate public IP address. Replace `$CLUSTER_NAME` with the name of your k8s cluster.
 
    ```bash
-   $ ibmcloud ks workers <your k8s cluster>
+   $ ibmcloud ks workers --cluster $CLUSTER_NAME
 
    ID                                                 Public IP        Private IP      Machine Type   State    Status   
    kube-dal10-paac005a5fa6c44786b5dfb3ed8728548f-w1   169.47.241.213   10.177.155.13   free           normal   Ready  
